@@ -64,6 +64,9 @@ balls = [{
     'init_spd_y' : ball_spd_y[0]
 }]
 
+# 제거할 공과 무기 인덱스 초기화
+remove_ball_idx = -1
+remove_weapon_idx = -1
 
 # 게임 루프
 running = True
@@ -74,7 +77,7 @@ while running:
             running = False
         # 캐릭터 이동
         if event.type == pygame.KEYDOWN:
-            if event.type == pygame.K_LEFT:
+            if event.key == pygame.K_LEFT:
                 character_speed -= 5
             elif event.key == pygame.K_RIGHT:
                 character_speed += 5
@@ -85,7 +88,7 @@ while running:
 
 
         if event.type == pygame.KEYUP:
-            if event.type == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 character_speed = 0
 
     character_pos_x += character_speed
@@ -107,16 +110,51 @@ while running:
         cur_ball_height = cur_ball_rect[1]
 
         if cur_ball['pos_y'] > screen_height - stage_height - cur_ball_height:
-            cur_ball['to_y'] = cur_ball['init_spd_y']
+             cur_ball['to_y'] = cur_ball['init_spd_y']
         else:
-            cur_ball['to_y'] += 0.5
+             cur_ball['to_y'] += 0.5
 
         if cur_ball['pos_x'] < 0 or cur_ball['pos_x'] > screen_width - cur_ball_width:
-            cur_ball['to_x'] *= -1
+             cur_ball['to_x'] *= -1
 
         cur_ball['pos_x'] += cur_ball['to_x']
         cur_ball['pos_y'] += cur_ball['to_y']
 
+    # 충돌 처리
+    for idx_ball, one_ball in enumerate(balls):
+        one_ball_rect = ball_img[one_ball['img_idx']].get_rect()
+        one_ball_rect.top = one_ball['pos_y']
+        one_ball_rect.left = one_ball['pos_x']
+
+    # 캐릭터 영역 추출
+    character_rect = character_img.get_rect()
+    character_rect.top = character_pos_y
+    character_rect.left = character_pos_x
+
+    # 공과 캐릭터 충돌 확인
+    if one_ball_rect.colliderect(character_rect):
+        running = False
+        print("GAME OVER")
+
+
+    # 공과 무기 충돌 확인
+    for idx_weapon, one_weapon in enumerate(weapons):
+        one_weapon_rect = weapon_img.get_rect()
+        one_weapon_rect.top = one_weapon[1]
+        one_weapon_rect.left = one_weapon[0]
+
+        if one_ball_rect.colliderect(one_weapon_rect):
+            remove_ball_idx = idx_ball
+            remove_weapon_idx = idx_weapon
+            break
+
+    # 충돌 객체 지우기
+    if remove_weapon_idx > -1:
+        del weapons[remove_weapon_idx]
+        remove_weapon_idx = -1
+    if remove_ball_idx > -1:
+        del balls[remove_ball_idx]
+        remove_ball_idx = -1
 
     # 화면 출력
     screen.blit(background_img, (0, 0))
