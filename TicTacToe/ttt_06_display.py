@@ -16,7 +16,6 @@ SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("TIC TAC TOE")
 
-
 # 게임 루프
 running = True
 while running:
