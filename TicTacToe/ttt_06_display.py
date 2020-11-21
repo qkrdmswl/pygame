@@ -1,5 +1,5 @@
 # ttt_06_display.py
-#
+# 파이게임 초기화
 # 틱택토 게임
 
 import pygame
